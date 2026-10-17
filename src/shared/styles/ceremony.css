@@ -1,0 +1,145 @@
+/* ───────── ceremony ───────── */
+.ceremony {
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: calc(48px + var(--safe-t)) 24px calc(32px + var(--safe-b));
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  overflow: hidden;
+}
+.cer-title {
+  margin-top: 14px;
+  font-family: var(--serif);
+  font-size: clamp(30px, 9vw, 42px);
+  line-height: 1.25;
+  overflow: hidden;
+}
+.cer-sub {
+  margin-top: 10px;
+  font-family: var(--script);
+  font-size: 26px;
+  color: var(--blue);
+}
+.env-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 0 10px;
+}
+.env {
+  position: relative;
+  width: min(86vw, 380px);
+  aspect-ratio: 1.42;
+  perspective: 1000px;
+}
+.env-body {
+  position: absolute;
+  inset: 0;
+}
+.env-back,
+.env-pocket,
+.env-flap {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+}
+.env-back {
+  z-index: 1;
+  background: linear-gradient(160deg, #2a6db5, #1d5597);
+  box-shadow: 0 40px 60px -25px rgba(19, 70, 130, 0.55);
+}
+.env-pocket {
+  z-index: 3;
+  background: linear-gradient(175deg, #4f9fdc 0%, #2f7cc4 100%);
+  clip-path: polygon(0 0, 50% 60%, 100% 0, 100% 100%, 0 100%);
+}
+.env-pocket::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.18), transparent 50%);
+}
+.env-flap {
+  z-index: 4;
+  bottom: auto;
+  height: 66%;
+  transform-origin: 50% 0;
+  background: linear-gradient(180deg, #65b2e8, #3a8bd0);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  border-radius: 14px 14px 0 0;
+}
+.env-seal {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: 66%;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #8a5f22;
+  background: radial-gradient(circle at 35% 30%, #fff3d4, #ecd39e 45%, #c4934b 100%);
+  box-shadow:
+    0 6px 18px rgba(19, 70, 130, 0.4),
+    inset 0 -3px 6px rgba(138, 95, 34, 0.35),
+    0 0 0 6px rgba(255, 255, 255, 0.35);
+}
+.env-seal svg.paw {
+  width: 28px;
+  height: 28px;
+}
+.env-card {
+  position: absolute;
+  z-index: 2;
+  left: 5%;
+  right: 5%;
+  top: 6%;
+}
+.ceremony:not(.is-open) .env-card {
+  pointer-events: none;
+}
+.burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 11;
+  pointer-events: none;
+}
+.burst i {
+  position: absolute;
+  font-style: normal;
+  font-size: 16px;
+  color: var(--blue-2);
+  opacity: 0;
+}
+.burst i:nth-child(3n + 1) {
+  color: var(--pink);
+}
+.burst i:nth-child(3n + 2) {
+  color: var(--gold);
+}
+.cer-tap {
+  margin-top: 30px;
+  font-size: 13px;
+  letter-spacing: 0.25em;
+  color: var(--muted);
+}
+.cer-final h2 {
+  margin: 10px 0 8px;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 36px;
+}
+.cer-final p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 22px;
+}

@@ -1,0 +1,152 @@
+/* 後台專用樣式（只會被 admin.html 載入） */
+
+.adm-hero {
+  margin-bottom: 12px;
+  padding: 20px 18px;
+  background: var(--surface);
+}
+.adm-hero .balance {
+  font-size: 54px;
+}
+.adm-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 14px;
+}
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: rgba(31, 158, 110, 0.12);
+  color: var(--ok);
+}
+.status-pill svg.i {
+  width: 16px;
+  height: 16px;
+}
+.status-pill.is-locked {
+  background: rgba(224, 82, 110, 0.1);
+  color: var(--danger);
+}
+
+.topup-form {
+  padding: 18px;
+  border-radius: 24px;
+}
+.quick-chips.center {
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.quick-chips.center button {
+  min-height: 40px;
+  padding: 8px 20px;
+  font-size: 15px;
+  font-family: var(--display);
+  font-weight: 600;
+}
+.topup-form .text-field {
+  margin-bottom: 10px;
+}
+.topup-form .sheet-summary {
+  margin: 4px 0 10px;
+}
+
+.sheet-summary b.pos {
+  color: var(--ok);
+}
+
+.void-btn {
+  min-height: 28px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--danger);
+  background: rgba(224, 82, 110, 0.08);
+  border: 1px solid rgba(224, 82, 110, 0.25);
+}
+.void-btn:active {
+  scale: 0.94;
+}
+
+.export-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 14px 16px;
+  border-radius: 20px;
+}
+.export-box > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.export-box b {
+  font-size: 15px;
+  font-weight: 500;
+}
+.export-box small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* 禮物兌換狀態（總覽） */
+.gift-status {
+  margin-top: 4px;
+  padding: 14px 16px 6px;
+  border-radius: 20px;
+}
+.gs-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+.gs-head svg.i {
+  width: 20px;
+  height: 20px;
+  color: #c4577f;
+}
+.gs-head b {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+}
+.gs-head span {
+  font-family: var(--display);
+  font-weight: 600;
+  color: var(--blue);
+}
+.gs-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+.gs-row svg.i {
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+.gs-row span {
+  flex: 1;
+}
+.gs-row em {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--muted);
+}
+.gs-row.on svg.i {
+  color: var(--ok);
+}
+.gs-row.on em {
+  color: var(--ok);
+}

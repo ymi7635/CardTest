@@ -1,0 +1,209 @@
+/* sheet */
+.sheet-root {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 40, 74, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: auto;
+}
+.sheet {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 88vh;
+  max-height: 88dvh;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px calc(22px + var(--safe-r)) calc(24px + var(--safe-b)) calc(22px + var(--safe-l));
+  border-radius: 30px 30px 0 0;
+  background: linear-gradient(180deg, #ffffff 0%, #f1f8fe 100%);
+  box-shadow: 0 -20px 60px rgba(19, 70, 130, 0.25);
+  text-align: center;
+  pointer-events: auto;
+}
+.sheet-grip {
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  margin: 0 auto 12px;
+  background: #c9dbec;
+}
+.sheet-x {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: var(--sky);
+}
+.sheet-x svg.i {
+  width: 16px;
+  height: 16px;
+}
+.sheet-body {
+  padding-top: 8px;
+}
+.sheet h3 {
+  margin: 14px 0 8px;
+  font-family: var(--serif);
+  font-size: 22px;
+  letter-spacing: 0.04em;
+}
+.sheet p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+.sheet-icon {
+  width: 68px;
+  height: 68px;
+  margin: 6px auto 0;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  background: var(--grad);
+  color: #fff;
+  box-shadow: 0 14px 30px -10px rgba(31, 99, 173, 0.7);
+}
+.sheet-icon svg.i {
+  width: 30px;
+  height: 30px;
+}
+.sheet-icon.danger {
+  background: var(--danger);
+  box-shadow: 0 14px 30px -10px rgba(224, 82, 110, 0.6);
+}
+.sheet-actions {
+  display: flex;
+  gap: 10px;
+}
+.sheet-actions .btn {
+  flex: 1;
+}
+.sheet-summary {
+  margin: -4px 0 20px;
+  padding: 4px 16px;
+  border-radius: 16px;
+  background: var(--sky);
+  font-size: 14px;
+}
+.sheet-summary > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  color: var(--muted);
+}
+.sheet-summary > div + div {
+  border-top: 1px solid var(--line);
+}
+.sheet-summary b {
+  color: var(--text);
+  font-weight: 500;
+}
+.sheet-summary b.neg {
+  color: var(--danger);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+.form label span {
+  display: block;
+  font-size: 13px;
+  color: var(--blue);
+  margin-bottom: 6px;
+}
+.form input {
+  width: 100%;
+  min-height: 50px;
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line-2);
+  background: #fff;
+  font-size: 16px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.form input:focus {
+  border-color: var(--blue-2);
+  box-shadow: 0 0 0 4px rgba(70, 163, 223, 0.18);
+}
+
+/* success */
+.ok-icon {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  margin: 10px auto 0;
+}
+.ok-ring {
+  width: 84px;
+  height: 84px;
+  padding: 20px;
+  border-radius: 50%;
+  background: var(--grad);
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 30;
+  box-shadow: 0 14px 34px -8px rgba(31, 99, 173, 0.65);
+}
+.ok-ring-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--blue-2);
+  transform: scale(1.6);
+  opacity: 0;
+}
+
+/* toast */
+.toasts {
+  position: fixed;
+  z-index: 80;
+  left: 0;
+  right: 0;
+  top: calc(14px + var(--safe-t));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  max-width: calc(100% - 40px);
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--blue-deep);
+  font-size: 14px;
+  box-shadow: 0 14px 30px -12px rgba(19, 70, 130, 0.45);
+}
