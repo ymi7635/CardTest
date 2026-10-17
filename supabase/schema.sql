@@ -463,13 +463,38 @@ begin
   return c;
 end $$;
 
--- 清空全部流水帳，卡片還原成「尚未開卡」，並產生她的新通行碼（舊連結立刻失效）。後台通行碼不變
-create or replace function app.reset_card() returns text
+-- 只換後台的通行碼（後台連結外流時使用）。她的通行碼與所有資料都不變
+create or replace function app.rotate_admin_token() returns text
+language plpgsql as $$
+declare
+  a text := app.new_token();
+begin
+  update app.card set admin_token_hash = app.sha(a) where id = 1;
+  return a;
+end $$;
+
+-- 清空全部流水帳，卡片還原成「尚未開卡」（內部使用：不處理通行碼）
+create or replace function app.clear_card() returns void
 language plpgsql as $$
 begin
   truncate app.transactions;
   update app.card set activated = false, locked = false, profile = null, activated_at = null where id = 1;
+end $$;
+
+-- 重置：清空全部資料、卡片回到尚未開卡，並產生她的新通行碼（舊連結立刻失效）。後台通行碼不變
+create or replace function app.reset_card() returns text
+language plpgsql as $$
+begin
+  perform app.clear_card();
   return app.rotate_card_token();
+end $$;
+
+-- 完整重置：清空全部資料、卡片回到尚未開卡，並且兩組通行碼（她、後台）都換成新的
+create or replace function app.reset_all() returns table (card_token text, admin_token text)
+language plpgsql as $$
+begin
+  perform app.clear_card();
+  return query select * from app.rotate_tokens();
 end $$;
 
 

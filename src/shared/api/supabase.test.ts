@@ -192,3 +192,119 @@ describe('schema.sql 可以重複執行', () => {
     expect((await db.query('select count(*)::int as n from app.gifts')).rows[0]).toEqual({ n: 2 })
   })
 })
+
+describe('supabase/reset.sql 的各個選項', () => {
+  const RESET_SQL = readFileSync(fileURLToPath(new URL('../../../supabase/reset.sql', import.meta.url)), 'utf8')
+  const profile = { name: 'QQ', firstMeet: 'a', favGift: 'b', dessert: 'c' }
+  const codeOf = async (p: Promise<unknown>) =>
+    p.then(
+      () => 'ok',
+      (e: unknown) => (e instanceof ApiError ? e.code : 'other'),
+    )
+
+  /** 讓卡片進入「已開卡、有一筆消費」的狀態，並回傳目前的兩組通行碼 */
+  async function usedState() {
+    await db.query('select app.reset_all()')
+    const r = await db.query<{ card_token: string; admin_token: string }>('select * from app.rotate_tokens()')
+    tokens.card = r.rows[0].card_token
+    tokens.admin = r.rows[0].admin_token
+    const h = await harness()
+    await h.card().activate(profile)
+    await h.card().spend({ title: '手搖飲', amount: 65, requestId: `req-${Math.random()}` })
+    return { ...tokens }
+  }
+
+  /** 把 reset.sql 裡被註解掉的某一行 SQL 取出來（拿掉開頭的 `-- `） */
+  const commented = (startsWith: string) => {
+    const line = RESET_SQL.split('\n').find((l) => l.startsWith(`-- ${startsWith}`))
+    if (!line) throw new Error(`reset.sql 找不到：${startsWith}`)
+    return line.slice(3)
+  }
+
+  it('【選項 A】檔案原樣執行：清空資料、卡片尚未開卡、她的碼換新、後台碼不變', async () => {
+    const old = await usedState()
+    const results = await db.exec(RESET_SQL) // 檔案裡只有選項 A 是啟用的
+    const row = results[results.length - 1].rows[0] as { new_card_token: string }
+    tokens.card = row.new_card_token
+
+    expect(row.new_card_token).toMatch(/^[0-9a-f]{64}$/)
+    expect(row.new_card_token).not.toBe(old.card)
+    expect(await codeOf(createSupabaseCardApi(old.card, config).getState())).toBe('INVALID_TOKEN')
+    const state = await createSupabaseCardApi(tokens.card, config).getState()
+    expect(state.activated).toBe(false)
+    expect(state.transactions).toEqual([])
+    expect(await codeOf(createSupabaseAdminApi(old.admin, config).getState())).toBe('ok') // 後台碼不變
+  })
+
+  it('【選項 B】app.reset_all()：清空資料，兩組通行碼都換新、舊的都失效', async () => {
+    const old = await usedState()
+    const results = await db.exec(commented('select * from app.reset_all();'))
+    const row = results[results.length - 1].rows[0] as { card_token: string; admin_token: string }
+    tokens.card = row.card_token
+    tokens.admin = row.admin_token
+
+    expect(row.card_token).not.toBe(old.card)
+    expect(row.admin_token).not.toBe(old.admin)
+    expect(await codeOf(createSupabaseCardApi(old.card, config).getState())).toBe('INVALID_TOKEN')
+    expect(await codeOf(createSupabaseAdminApi(old.admin, config).getState())).toBe('INVALID_TOKEN')
+    const state = await createSupabaseAdminApi(row.admin_token, config).getState()
+    expect(state.activated).toBe(false)
+    expect(state.transactions).toEqual([])
+  })
+
+  it('【選項 C】app.rotate_admin_token()：只換後台通行碼，她的碼與全部資料都不變', async () => {
+    const old = await usedState()
+    const before = await createSupabaseCardApi(old.card, config).getState()
+    const results = await db.exec(commented('select app.rotate_admin_token() as new_admin_token;'))
+    const row = results[results.length - 1].rows[0] as { new_admin_token: string }
+    tokens.admin = row.new_admin_token
+
+    expect(row.new_admin_token).not.toBe(old.admin)
+    expect(await codeOf(createSupabaseAdminApi(old.admin, config).getState())).toBe('INVALID_TOKEN')
+    expect(await codeOf(createSupabaseAdminApi(row.new_admin_token, config).getState())).toBe('ok')
+    const after = await createSupabaseCardApi(old.card, config).getState() // 她的舊碼仍然有效
+    expect(after).toEqual({ ...before, serverTime: after.serverTime })
+    expect(after.transactions.length).toBe(2) // 初始額度 + 一筆消費，都還在
+  })
+
+  it('【選項 D】整套砍掉重建：刪除指令有效，之後重跑 schema.sql 與 tokens 就是全新的資料庫', async () => {
+    const old = await usedState()
+    const block = RESET_SQL.split('-- [[DROP-BEGIN]]')[1]?.split('-- [[DROP-END]]')[0]
+    if (!block) throw new Error('reset.sql 找不到 DROP 區塊')
+    await db.exec(
+      block
+        .split('\n')
+        .map((l) => l.replace(/^-- ?/, ''))
+        .join('\n'),
+    )
+
+    const gone = await db.query<{ n: number }>(
+      `select (select count(*) from pg_namespace where nspname = 'app')::int
+            + (select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+                where n.nspname = 'public' and (p.proname like 'card\_%' or p.proname like 'admin\_%'))::int as n`,
+    )
+    expect(gone.rows[0].n).toBe(0) // app schema 與 10 個對外函式都消失了
+
+    await db.exec(SCHEMA)
+    const fresh = await db.query<{ card_token: string; admin_token: string }>('select * from app.rotate_tokens()')
+    tokens.card = fresh.rows[0].card_token
+    tokens.admin = fresh.rows[0].admin_token
+
+    expect(await codeOf(createSupabaseCardApi(old.card, config).getState())).toBe('INVALID_TOKEN')
+    expect(await codeOf(createSupabaseAdminApi(old.admin, config).getState())).toBe('INVALID_TOKEN')
+    const state = await createSupabaseCardApi(tokens.card, config).getState()
+    expect(state.activated).toBe(false)
+    expect(state.transactions).toEqual([])
+  })
+
+  it('這些重置函式都在 app schema，對外（anon）完全呼叫不到', async () => {
+    await db.exec('set role anon')
+    try {
+      for (const fn of ['app.reset_all()', 'app.rotate_admin_token()', 'app.clear_card()']) {
+        expect(await errorOf(db.query(`select ${fn}`))).toMatch(/permission denied/)
+      }
+    } finally {
+      await db.exec('reset role')
+    }
+  })
+})

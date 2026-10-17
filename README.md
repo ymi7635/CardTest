@@ -252,7 +252,8 @@ select app.balance() as balance;
 | 備份資料 | 後台 → **明細** 最下方 → **匯出**（CSV，可用 Excel 打開）。建議定期做 |
 | 連結外流、或想換通行碼 | Supabase SQL Editor 執行 `select * from app.rotate_tokens();`，得到兩組新的，舊的立刻失效，再把新連結傳給對方 |
 | 只換她的通行碼 | 執行 `select app.rotate_card_token();` |
-| 測試完要重來（**只限測試專案**） | 貼上 [`supabase/reset.sql`](supabase/reset.sql) → Run：清空全部資料、卡片回到尚未開卡，並產生她的新通行碼 |
+| 只換後台通行碼（後台連結外流、或弄丟後台通行碼） | 執行 `select app.rotate_admin_token();`，她的通行碼與全部資料都不變。這個函式要重新貼上最新的 `schema.sql` 才有 |
+| 測試完要重來（**只限測試專案**） | 貼上 [`supabase/reset.sql`](supabase/reset.sql) → Run。預設是「選項 A」：清空全部資料、卡片回到尚未開卡，並產生她的新通行碼（後台通行碼不變）。檔案裡還有其他選項（兩組碼都換、只換後台碼、整套砍掉重建），註解寫得很清楚 |
 | 網站打不開、顯示無法連線 | Supabase 免費專案**閒置約一週會被暫停**。到 Supabase Dashboard 按 **Restore** 即可恢復（資料還在）。偶爾打開後台看一下可以避免 |
 | 更新網站內容 | 在 GitHub 修改檔案並提交，Vercel 會**自動重新部署**（約 1 分鐘） |
 
